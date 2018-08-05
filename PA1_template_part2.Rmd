@@ -1,5 +1,5 @@
 ---
-title: "reproducible_research_week2"
+title: "reproducible_research_week2_part2"
 author: "tge"
 date: "7/21/2018"
 output: html_document
@@ -8,59 +8,6 @@ output: html_document
 ##Loading and preprocessing the data
 ```{r read, echo=TRUE}
 data <- read.csv("~/Downloads/activity.csv")
-```
-
-##What is mean total number of steps per day? 
-
-###1. Calculate the total number of steps taken per day
-```{r step-day, echo=TRUE}
-#aggregate the data set by summing steps in the same day
-data_day <- aggregate(data$steps, by=list(data$date), sum)
-#rename columns
-names(data_day)[1] = "date"
-names(data_day)[2] = "total_steps"
-#show head of the new dataset
-head(data_day)
-```
-
-###2. Make a histogram of the total number of steps taken each day
-```{r histogram, echo=TRUE}
-#plot total daily steps
-library(ggplot2)
-ggplot(data_day, aes(x=total_steps)) + 
-  geom_histogram(color = "black", binwidth = 1200) + 
-  labs(title = "Histogram of Total Daily Steps", x = "Daily Steps", y = "Number of Days")
-```
-
-###3. Calculate and report the mean and median of the total number of steps taken per day
-```{r mean}
-mean(data_day$total_steps, na.rm = TRUE)
-```
-```{r median}
-median(data_day$total_steps, na.rm = TRUE)
-```
-
-##What is the average daily activity pattern?
-
-###1. Make a time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
-```{r daily, echo=TRUE}
-#subset of the data with NA removed
-data_clean <- data[!is.na(data$steps),]
-#aggregate the clean data set by taking the mean for each time interval
-data_clean_mean <- aggregate(data_clean$steps, by=list(data_clean$interval), mean)
-#rename columns of data_clean_mean
-names(data_clean_mean)[1] = "interval"
-names(data_clean_mean)[2] = "mean_steps"
-#time series plot
-ggplot(data_clean_mean, aes(x=interval, y=mean_steps))+
-  geom_line(color="black")+
-  labs(title="Mean Steps vs. Time Interval", x="interval", y="mean steps")
-```
-
-###2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
-```{r max, echo=TRUE}
-max_mean <- data_clean_mean[which.max(data_clean_mean$mean_steps),]
-max_mean
 ```
 
 ##Imputing missing values
@@ -88,7 +35,9 @@ sum(is.na(data2$steps))
 ```
 
 ###4a. Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. 
+
 ```{r histogram_new, echo=TRUE}
+library(ggplot2)
 #aggregate the new data set by summing steps in the same day
 data2_day <- aggregate(data2$steps, by=list(data2$date), sum)
 #rename columns
@@ -103,6 +52,17 @@ ggplot(data2_day, aes(x=total_steps)) +
 ```
 
 ###4b. Do these values differ from the estimates from the first part of the assignment? 
+
+```{r step-day, echo=TRUE}
+#aggregate the data set by summing steps in the same day
+data_day <- aggregate(data$steps, by=list(data$date), sum)
+#rename columns
+names(data_day)[1] = "date"
+names(data_day)[2] = "total_steps"
+#show head of the new dataset
+head(data_day)
+```
+
 ```{r compare_mean, echo=TRUE}
 old_mean <- mean(data_day$total_steps, na.rm = TRUE)
 new_mean <- mean(data2_day$total_steps)
@@ -124,14 +84,6 @@ new_median - old_median
 Median increases by 1.19.
 
 ###4c. What is the impact of imputing missing data on the estimates of the total daily number of steps?
-
-```{r compare, echo=TRUE}
-data_merge <- merge(data_day, data2_day, by="date")
-ggplot(data_merge) + 
-  geom_histogram(aes(x=total_steps.x),color="black", binwidth = 1200) + 
-  geom_histogram(aes(x=total_steps.y),fill =rgb(0,0,1,1/4), binwidth = 1200) +
-  labs(title = "Histogram of Total Daily Steps", x = "Daily Steps", y = "Number of Days") 
-```
 
 Move the estimates towards the mean. Counts for mean steps increase.
 
